@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-using Stargate.Blazor.Data;
+using StargateAPI.Business.Commands;
+using StargateAPI.Business.Data;
+using StargateAPI.Business.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +14,23 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.AddRequestPreProcessor<CreateAstronautDutyPreProcessor>();
+    cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
+});
+
+builder.Services.AddTransient<IDataAccess, StargateContext>();
+builder.Services.AddTransient<ILogger, DatabaseLogger>();
+
+builder.Services.AddDbContext<StargateContext>(options =>
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("StarbaseApiDatabase"));
+});
+
 builder.Services.AddMudServices();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -20,7 +38,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

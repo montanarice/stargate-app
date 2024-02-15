@@ -23,7 +23,8 @@ public class CreateAstronautDutyHandler : IRequestHandler<CreateAstronautDuty, C
     {
         // TODO: This method feels smelly and too big. Investigate and test thoroughly
         // TODO CRITICAL: Many business rules to guard here. Probably missed a few, come back to this ASAP
-        // TODO: Need to guard against adding a duty with a start date before person's career start date
+        // TODO BUG: Need to guard against adding a duty with a start date before person's career start date
+        // TODO BUG: Adding a new person on the same day RETIRED duty is entered causes the person to be retired the day before their career starts.
 
         try
         {

@@ -1,0 +1,197 @@
+﻿@page "/acts"
+
+@using System.Text.Json
+@using System.Diagnostics
+@using StargateAPI.Business.Data
+@using StargateAPI.Business.Dtos
+@using StargateAPI.Business.Enums
+@using StargateAPI.Business.Results
+@using System.ComponentModel.DataAnnotations
+
+@inject IHttpClientFactory ClientFactory
+
+<PageTitle>ACTS</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Welcome to the Astronaut Career Tracking System</MudText>
+
+ @* TODO: Turn this to table with related data button if time*@
+
+<MudTable Items="@_persons"
+          Dense="@_dense"
+          Hover="@_hover" 
+          Bordered="@_bordered" 
+          Striped="@_striped" 
+          Loading="@_loading" 
+          LoadingProgressColor="Color.Info"
+          Filter="new Func<PersonAstronaut,bool>(FilterFunc1)" @bind-SelectedItem="_selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">ACTS Manifest</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString1" 
+                      Placeholder="Search" 
+                      Adornment="Adornment.Start" 
+                      AdornmentIcon="@Icons.Material.Filled.Search" 
+                      IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Career Start</MudTh>
+        <MudTh>Career End</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID">@context.PersonId</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Career Start">@context.CareerStartDate</MudTd>
+        <MudTd DataLabel="Career End">@context.CareerEndDate</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+<div class="d-flex flex-wrap mt-4">
+    <MudSwitch @bind-Checked="@_hover" Color="Color.Primary">Hover</MudSwitch>
+    <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Dense</MudSwitch>
+    <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Striped</MudSwitch>
+    <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordered</MudSwitch>
+    <MudSpacer />
+    <div style="min-width:200px;">
+        <MudText Inline="true" Class="align-self-center">Selected1: @_selectedItem1?.Name</MudText>
+    </div>
+</div>
+
+<MudTextField @bind-Value="_currentDuty" Label="Enter Astronaut to View Duty History" Variant="Variant.Text"></MudTextField>
+<MudButton
+    Variant="Variant.Filled"
+    Color="Color.Primary"
+    OnClick="() => SetDutiesByName(_currentDuty)">
+</MudButton>
+
+@* TODO: Very messy come back to if time *@
+<MudTable Items="@_activeDutyHistory"
+          Dense="@_dense"
+          Hover="@_hover"
+          Bordered="@_bordered"
+          Striped="@_striped"
+          Loading="@_loading"
+          LoadingProgressColor="Color.Info">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Astronaut Duty History</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Duty Title</MudTh>
+        <MudTh>Rank</MudTh>
+        <MudTh>Start Date</MudTh>
+        <MudTh>End Date</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Duty Title">@context.DutyTitle.PrintPretty()</MudTd>
+        <MudTd DataLabel="Rank">@context.Rank.PrintPretty()</MudTd>
+        <MudTd DataLabel="Start Date">@context.DutyStartDate</MudTd>
+        <MudTd DataLabel="End Date">@context.DutyEndDate</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+
+    private bool _dense = true;
+    private bool _hover = true;
+    private bool _striped;
+    private bool _bordered;
+    private bool _loading;
+    private bool _responseError;
+    private string _searchString1 = "";
+
+    private PersonAstronaut? _selectedItem1;
+
+    private IEnumerable<PersonAstronaut>? _persons;
+    private IEnumerable<AstronautDuty>? _activeDutyHistory;
+
+    private string _currentDuty = "John Doe";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: Parametrize request URI from lookup table
+        var personRequest = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7204/Person");
+        var client = ClientFactory.CreateClient();
+
+        _loading = true;
+        var response = await client.SendAsync(personRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            var requestResult = await JsonSerializer.DeserializeAsync<GetPeopleResult>(responseStream);
+            _persons = requestResult!.People;
+            _loading = false;
+        }
+        else
+        {
+            Debug.WriteLine("Response failed code.");
+            _responseError = true;
+            _loading = false;
+        }
+
+        _activeDutyHistory = await GetDutiesByName("John Doe");
+    }
+
+    private bool FilterFunc1(PersonAstronaut person) => FilterFunc(person, _searchString1);
+
+    private bool FilterFunc(PersonAstronaut person, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (person.PersonId.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (person.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (person.CurrentDutyTitle.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (person.CurrentRank.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        // TODO FEATURE: Search by date range
+        return false;
+    }
+
+    private async Task<IEnumerable<AstronautDuty>> GetDutiesByName(string name)
+    {
+        // TODO: Parametrize request URI from lookup table
+        // https://localhost:7204/AstronautDuty/John%20Doe
+        var dutyRequest = new HttpRequestMessage(
+            HttpMethod.Get, $"https://localhost:7204/AstronautDuty/{name}");
+            
+        var client = ClientFactory.CreateClient();
+        _loading = true;
+
+        var response = await client.SendAsync(dutyRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            
+            var requestResult = await JsonSerializer.DeserializeAsync<GetAstronautDutiesByNameResult>(responseStream);
+            _loading = false;
+
+            return requestResult!.AstronautDuties;
+        }
+        else
+        {
+            Debug.WriteLine("Response failed code.");
+            _responseError = true;
+            _loading = false;
+
+            return new List<AstronautDuty>();
+        }
+    }
+
+    private async Task SetDutiesByName(string name)
+    {
+        // TODO: Tidy this up if time
+        _activeDutyHistory = await GetDutiesByName(name);
+    }
+
+}
+
