@@ -1,6 +1,6 @@
 ﻿using StargateAPI.Controllers;
 
-namespace StargateAPI.Business.Commands;
+namespace StargateAPI.Business.Results;
 
 public class CreatePersonResult : BaseResponse
 {
