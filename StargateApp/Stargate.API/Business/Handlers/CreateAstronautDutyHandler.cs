@@ -23,6 +23,7 @@ public class CreateAstronautDutyHandler : IRequestHandler<CreateAstronautDuty, C
     {
         // TODO: This method feels smelly and too big. Investigate and test thoroughly
         // TODO CRITICAL: Many business rules to guard here. Probably missed a few, come back to this ASAP
+        // TODO: Need to guard against adding a duty with a start date before person's career start date
 
         try
         {
