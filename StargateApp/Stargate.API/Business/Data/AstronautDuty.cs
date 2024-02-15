@@ -1,33 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using StargateAPI.Business.Enums;
 
 namespace StargateAPI.Business.Data
 {
     [Table("AstronautDuty")]
     public class AstronautDuty
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
+        [JsonPropertyName("personId")]
         public int PersonId { get; set; }
 
-        public string Rank { get; set; } = string.Empty;
+        [JsonPropertyName("rank")]
+        public Rank Rank { get; set; }
 
-        public string DutyTitle { get; set; } = string.Empty;
+        [JsonPropertyName("dutyTitle")]
+        public DutyTitle DutyTitle { get; set; }
 
+        [JsonPropertyName("dutyStartDate")]
         public DateTime DutyStartDate { get; set; }
 
+        [JsonPropertyName("dutyEndDate")]
         public DateTime? DutyEndDate { get; set; }
 
-        public virtual Person Person { get; set; }
-    }
-
-    public class AstronautDutyConfiguration : IEntityTypeConfiguration<AstronautDuty>
-    {
-        public void Configure(EntityTypeBuilder<AstronautDuty> builder)
-        {
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        }
+        [JsonPropertyName("person")]
+        public virtual Person? Person { get; set; }
     }
 }

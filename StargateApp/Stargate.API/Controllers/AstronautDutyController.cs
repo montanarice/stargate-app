@@ -11,6 +11,7 @@ namespace StargateAPI.Controllers
     public class AstronautDutyController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public AstronautDutyController(IMediator mediator)
         {
             _mediator = mediator;
@@ -21,11 +22,7 @@ namespace StargateAPI.Controllers
         {
             try
             {
-                var result = await _mediator.Send(new GetPersonByName()
-                {
-                    Name = name
-                });
-
+                var result = await _mediator.Send(new GetAstronautDutiesByName(name));
                 return this.GetResponse(result);
             }
             catch (Exception ex)

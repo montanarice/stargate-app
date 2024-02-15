@@ -1,19 +1,29 @@
-﻿namespace StargateAPI.Business.Dtos
+﻿using System.Text.Json.Serialization;
+using StargateAPI.Business.Data;
+using StargateAPI.Business.Enums;
+
+namespace StargateAPI.Business.Dtos;
+
+public class PersonAstronaut
 {
-    public class PersonAstronaut
-    {
-        public int PersonId { get; set; }
+    [JsonPropertyName("personId")]
+    public int PersonId { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
 
-        public string CurrentRank { get; set; } = string.Empty;
+    [JsonPropertyName("currentRank")]
+    public Rank CurrentRank { get; set; }
 
-        public string CurrentDutyTitle { get; set; } = string.Empty;
+    [JsonPropertyName("currentDutyTitle")]
+    public DutyTitle CurrentDutyTitle { get; set; }
 
-        public DateTime? CareerStartDate { get; set; }
+    [JsonPropertyName("careerStartDate")]
+    public DateTime? CareerStartDate { get; set; }
 
-        public DateTime? CareerEndDate { get; set; }
+    [JsonPropertyName("careerEndDate")]
+    public DateTime? CareerEndDate { get; set; }
 
-
-    }
+    [JsonPropertyName("astronautDuties")]
+    private ICollection<AstronautDuty> AstronautDuties { get; set; } = new List<AstronautDuty>();
 }
