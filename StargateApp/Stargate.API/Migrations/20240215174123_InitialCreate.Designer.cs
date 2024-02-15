@@ -11,7 +11,7 @@ using StargateAPI.Business.Data;
 namespace StargateAPI.Migrations
 {
     [DbContext(typeof(StargateContext))]
-    [Migration("20240215170017_InitialCreate")]
+    [Migration("20240215174123_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -47,6 +47,25 @@ namespace StargateAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("AstronautDetail");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CareerEndDate = new DateTime(2010, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CareerStartDate = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentDutyTitle = 5,
+                            CurrentRank = 7,
+                            PersonId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CareerStartDate = new DateTime(1995, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentDutyTitle = 0,
+                            CurrentRank = 8,
+                            PersonId = 2
+                        });
                 });
 
             modelBuilder.Entity("StargateAPI.Business.Data.AstronautDuty", b =>
@@ -81,6 +100,51 @@ namespace StargateAPI.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("AstronautDuty");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DutyEndDate = new DateTime(2000, 12, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyStartDate = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyTitle = 3,
+                            PersonId = 1,
+                            Rank = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DutyEndDate = new DateTime(2010, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyStartDate = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyTitle = 2,
+                            PersonId = 1,
+                            Rank = 5
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DutyStartDate = new DateTime(2010, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyTitle = 5,
+                            PersonId = 1,
+                            Rank = 7
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DutyEndDate = new DateTime(2000, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyStartDate = new DateTime(1995, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyTitle = 3,
+                            PersonId = 2,
+                            Rank = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DutyStartDate = new DateTime(2000, 5, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DutyTitle = 0,
+                            PersonId = 2,
+                            Rank = 8
+                        });
                 });
 
             modelBuilder.Entity("StargateAPI.Business.Data.LogTableEntry", b =>
@@ -113,6 +177,18 @@ namespace StargateAPI.Migrations
                     b.ToTable("Person");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "person");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "John Doe"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Jane Doe"
+                        });
                 });
 
             modelBuilder.Entity("StargateAPI.Business.Data.AstronautDetail", b =>

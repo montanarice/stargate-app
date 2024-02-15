@@ -5,6 +5,7 @@ using StargateAPI.Business.Exceptions;
 
 namespace StargateAPI.Business.Handlers;
 
+// TODO FEATURE: Allow option of create person with parameterized start date
 public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonResult>
 {
     private readonly IDataAccess _context;
@@ -16,11 +17,6 @@ public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonRes
         _logger = logger;
     }
 
-    /// <summary>
-    ///     On addition of new person,
-    ///         (1) Add person to the person data store
-    ///         (2) Add person to astronaut detail data store with career start date
-    /// </summary>
     public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken cancellationToken)
     {
         // TODO: Code smell in this test? Having trouble testing this using Mocks due to database state update. Can fix with correct usage of IDataAccess
