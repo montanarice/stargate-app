@@ -22,15 +22,6 @@ public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonRes
         // TODO: Code smell in this test? Having trouble testing this using Mocks due to database state update. Can fix with correct usage of IDataAccess
         // TODO define and catch specific business rules and chose to throw or ignore.
 
-        // Precondition: Person must not already exist
-        if (_context.People.Select(p => p.Name).Contains(request.Name))
-        {
-            var ex = new BusinessRuleBrokenException("Rule 1: Attempted to create a person with already existing name.");
-            _logger.LogError(exception: ex, message: "Duplicate name");
-
-            // TODO CRITICAL: Return correct endpoint error code (not 200)
-        }
-
         // Initialize the DTOs
         var newPerson = new Person { Name = request.Name };
         var newDetail = new AstronautDetail
@@ -39,6 +30,19 @@ public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonRes
             Person = newPerson,
             PersonId = newPerson.Id
         };
+
+        // Precondition: Person must not already exist
+        if (_context.People.Select(p => p.Name).Contains(request.Name))
+        {
+            var ex = new BusinessRuleBrokenException("Rule 1: Attempted to create a person with already existing name.");
+            _logger.LogError(exception: ex, message: "Duplicate name");
+
+            // TODO CRITICAL: Return correct endpoint error code (not 200)
+            return new CreatePersonResult()
+            {
+                Id = newPerson.Id
+            };
+        }
 
         // Add to Person data store
         await _context.AddAsync(newPerson, cancellationToken);
