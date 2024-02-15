@@ -28,4 +28,4 @@ I can write those scripts later today if desired, just let me know!
 
 ## Other Thoughts
 - I left many comments in the code marked as TODO to show what I would do if not rushing everything for a proof of concept app. Feel free to check those out for discussion topics and design decisions.
-- Specifically, check comments marked `// TODO CRITICAL: <some message>` for lingering things I view as top priority.
+- Specifically, check comments marked `// TODO CRITICAL` and `// TODO IMPORTANT:`for lingering things I view as top priority.
