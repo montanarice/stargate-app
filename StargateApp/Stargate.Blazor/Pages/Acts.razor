@@ -6,7 +6,6 @@
 @using StargateAPI.Business.Dtos
 @using StargateAPI.Business.Enums
 @using StargateAPI.Business.Results
-@using System.ComponentModel.DataAnnotations
 
 @inject IHttpClientFactory ClientFactory
 
@@ -49,26 +48,36 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
+@* *@
+@* <div class="d-flex flex-wrap mt-4"> *@
+@*     <MudSwitch @bind-Checked="@_hover" Color="Color.Primary">Hover</MudSwitch> *@
+@*     <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Dense</MudSwitch> *@
+@*     <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Striped</MudSwitch> *@
+@*     <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordered</MudSwitch> *@
+@*     <MudSpacer /> *@
+@*     <div style="min-width:200px;"> *@
+@*         <MudText Inline="true" Class="align-self-center">Selected1: @_selectedItem1?.Name</MudText> *@
+@*     </div> *@
+@* </div> *@
 
-<div class="d-flex flex-wrap mt-4">
-    <MudSwitch @bind-Checked="@_hover" Color="Color.Primary">Hover</MudSwitch>
-    <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Dense</MudSwitch>
-    <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Striped</MudSwitch>
-    <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordered</MudSwitch>
-    <MudSpacer />
-    <div style="min-width:200px;">
-        <MudText Inline="true" Class="align-self-center">Selected1: @_selectedItem1?.Name</MudText>
-    </div>
-</div>
+<br/>
 
-<MudTextField @bind-Value="_currentDuty" Label="Enter Astronaut to View Duty History" Variant="Variant.Text"></MudTextField>
+@* TODO: Very messy come back to if time *@
+<MudText Typo="Typo.h5" GutterBottom="true">View Duty History</MudText>
+<MudItem xs="12" sm="6" md="4">
+    <MudAutocomplete T="string"
+                     Label="Astronaut Name"
+                     SearchFunc="@SearchForNames"
+                     @bind-Value="_activeDutySearchName">
+    </MudAutocomplete>
+</MudItem>
+
 <MudButton
     Variant="Variant.Filled"
     Color="Color.Primary"
-    OnClick="() => SetDutiesByName(_currentDuty)">
+    OnClick="() => SetDutiesByName(_activeDutySearchName)">
+        Click To Search
 </MudButton>
-
-@* TODO: Very messy come back to if time *@
 <MudTable Items="@_activeDutyHistory"
           Dense="@_dense"
           Hover="@_hover"
@@ -103,6 +112,7 @@
     private bool _bordered;
     private bool _loading;
     private bool _responseError;
+    private bool _resetValueOnEmptyText;
     private string _searchString1 = "";
 
     private PersonAstronaut? _selectedItem1;
@@ -111,6 +121,8 @@
     private IEnumerable<AstronautDuty>? _activeDutyHistory;
 
     private string _currentDuty = "John Doe";
+    private string _activeDutySearchName = "John Doe";
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,6 +148,17 @@
         }
 
         _activeDutyHistory = await GetDutiesByName("John Doe");
+    }
+
+    private Task<IEnumerable<string>> SearchForNames(string value)
+    {
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return Task.FromResult(_persons!.Select(p => p.Name));
+
+        return Task.FromResult(_persons!
+            .Where(p => p.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+            .Select(p => p.Name));
     }
 
     private bool FilterFunc1(PersonAstronaut person) => FilterFunc(person, _searchString1);
