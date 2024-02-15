@@ -1,63 +1,31 @@
-﻿<!--v002-->
-# Stargate
+# Stargate Webapp
+This is a proof of concept .NET 7.0 application showing a range of full-stack technologies including,
+- CQRS structure using MediatR.
+- Abstracted data access layer (see `IDataAccess`) working with EF Core.
+- Unit tests using Moq, taking advantage of the abstracted data access layer.
+- RESTful API connected to SQLite database.
+- A blazor front end interface making requests to the separated API.
+- Logger injection and database logging.
 
-***
+## Application Structure
+The application is separated into a layered architecture to try to avoid a monolithic structure as simply as possible.
+- `Stargate.API` - This is a runnable application which supports astronaut  RESTful API interaction.
+    - TODO: For another time, consider refactoring this project into `Stargate.API`, `Stargate.DataAccess`, and `Stargate.DB` projects. The API project should just be reponsible for endpoint handling and requests to MediatR. The DataAccess project should handle MediatR and abstract data access components, and `Stargate.DB` would host the actual SQLite database.
+- `Stargate.Blazor` - This is a runnable application that starts up the web app, allowing for user interaction to view astronaut data.
 
-## Astronaut Career Tracking System (ACTS)
+## How to Run
+In order to keep effort time under half a day, I did not set up build and deploy scripts so you will need to clone the repository and build in visual studio.
+I can write those scripts later today if desired, just let me know!
 
-ACTS is used as a tool to maintain a record of all the People that have served as Astronauts. When serving as an Astronaut, your *Job* (Duty) is tracked by your Rank, Title and the Start and End Dates of the Duty.
+- Clone the repository
+- Update NuGet packages
+- Build the solution
+- [Optional] Initialize the database (if not included in source control) with...
+    - `~/StargateApp/Stargate.API> dotnet ef migrations add InitialCreate`
+    - `~/StargateApp/Stargate.API> dotnet dotnet ef database update`
+- Run in visual studio as multiple startup projects, `Stargate.API` and `Stargate.Blazor`
+- Perform CRUD operations on the Swagger API UI and see the updates on the Blazor webpage.
 
-The People that exist in this system are not all Astronauts. ACTS maintains a master list of People and Duties that are updated from an external service (not controlled by ACTS). The update schedule is determined by the external service.
-
-## Definitions
-
-1. A person's astronaut assignment is the Astronaut Duty.
-1. A person's current astronaut information is stored in the Astronaut Detail table.
-1. A person's list of astronaut assignments is stored in the Astronaut Duty table.
-
-## Requirements
-
-##### Enhance the Stargate API (Required)
-
-The REST API is expected to do the following:
-
-1. Retrieve a person by name.
-1. Retrieve all people.
-1. Add/update a person by name.
-1. Retrieve Astronaut Duty by name.
-1. Add an Astronaut Duty.
-
-##### Implement a user interface: (Optional)
-
-The UI is expected to do the following:
-
-1. Successfully run a console, web, or application without errors.
-1. Implement call(s) to retrieve an individual's astronaut dutys.
-1. Display the progress of the process and the results in a visually sophisticated and appealing manner.
-
-## Tasks
-
-Overview
-Examine the code, find and resolve any flaws, if any exist. Identify design patterns and follow or change them. Provide fix(es) and be prepared to describe the changes.
-
-1. Generate the database
-   * This is your source and storage location
-1. Enforce the rules
-1. Improve defensive coding
-1. Add unit tests
-   * identify the most impactful methods requiring tests
-   * reach >50% code coverage
-1. Implement process logging
-   * Log exceptions
-   * Log successes
-   * Store the logs in the database
-
-## Rules
-
-1. A Person is uniquely identified by their Name.
-1. A Person who has not had an astronaut assignment will not have Astronaut records.
-1. A Person will only ever hold one current Astronaut Duty Title, Start Date, and Rank at a time.
-1. A Person's Current Duty will not have a Duty End Date.
-1. A Person's Previous Duty End Date is set to the day before the New Astronaut Duty Start Date when a new Astronaut Duty is received for a Person.
-1. A Person is classified as 'Retired' when a Duty Title is 'RETIRED'.
-1. A Person's Career End Date is one day before the Retired Duty Start Date.
+## Other Thoughts
+- I left many comments in the code marked as TODO to show what I would do if not rushing everything for a proof of concept app. Feel free to check those out for discussion topics and design decisions.
+- Specifically, check comments marked `// TODO CRITICAL: <some message>` for lingering things I view as top priority.

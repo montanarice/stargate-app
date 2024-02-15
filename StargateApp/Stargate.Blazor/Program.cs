@@ -21,9 +21,11 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 });
 
+// TODO REVIEW: ILogger should be singleton but currently has dependency on transient StargateContext
 builder.Services.AddTransient<IDataAccess, StargateContext>();
 builder.Services.AddTransient<ILogger, DatabaseLogger>();
 
+// TODO REVIEW: Need to figure out how to best inject EFCore as optional data access 
 builder.Services.AddDbContext<StargateContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("StarbaseApiDatabase"));
@@ -34,7 +36,6 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

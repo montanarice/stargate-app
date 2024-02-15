@@ -11,6 +11,8 @@
 
 <PageTitle>ACTS</PageTitle>
 
+@* TODO IMPORTANT: This entire page is quite messy. Lots of shortcuts used and tech. debt. Return to soon when time.*@
+
 <MudText Typo="Typo.h3" GutterBottom="true">Welcome to the Astronaut Career Tracking System</MudText>
 
  @* TODO: Turn this to table with related data button if time*@
@@ -18,8 +20,6 @@
 <MudTable Items="@_persons"
           Dense="@_dense"
           Hover="@_hover" 
-          Bordered="@_bordered" 
-          Striped="@_striped" 
           Loading="@_loading" 
           LoadingProgressColor="Color.Info"
           Filter="new Func<PersonAstronaut,bool>(FilterFunc1)" @bind-SelectedItem="_selectedItem1">
@@ -48,17 +48,6 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
-@* *@
-@* <div class="d-flex flex-wrap mt-4"> *@
-@*     <MudSwitch @bind-Checked="@_hover" Color="Color.Primary">Hover</MudSwitch> *@
-@*     <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Dense</MudSwitch> *@
-@*     <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Striped</MudSwitch> *@
-@*     <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordered</MudSwitch> *@
-@*     <MudSpacer /> *@
-@*     <div style="min-width:200px;"> *@
-@*         <MudText Inline="true" Class="align-self-center">Selected1: @_selectedItem1?.Name</MudText> *@
-@*     </div> *@
-@* </div> *@
 
 <br/>
 
@@ -81,8 +70,6 @@
 <MudTable Items="@_activeDutyHistory"
           Dense="@_dense"
           Hover="@_hover"
-          Bordered="@_bordered"
-          Striped="@_striped"
           Loading="@_loading"
           LoadingProgressColor="Color.Info">
     <ToolBarContent>
@@ -108,11 +95,8 @@
 
     private bool _dense = true;
     private bool _hover = true;
-    private bool _striped;
-    private bool _bordered;
     private bool _loading;
     private bool _responseError;
-    private bool _resetValueOnEmptyText;
     private string _searchString1 = "";
 
     private PersonAstronaut? _selectedItem1;
@@ -120,7 +104,6 @@
     private IEnumerable<PersonAstronaut>? _persons;
     private IEnumerable<AstronautDuty>? _activeDutyHistory;
 
-    private string _currentDuty = "John Doe";
     private string _activeDutySearchName = "John Doe";
     
 
